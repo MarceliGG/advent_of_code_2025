@@ -1,0 +1,70 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+)
+
+type Dial struct {
+	cur   int
+	total int
+}
+
+func (d *Dial) Rotate(r string) {
+	direction := r[0]
+	n, err := strconv.Atoi(r[1:])
+	if err != nil {
+		log.Fatal(err)
+	}
+	switch direction {
+	case 'L':
+		fmt.Printf("%v - %v = ", d.cur, r[1:])
+		d.cur -= n
+	case 'R':
+		fmt.Printf("%v + %v = ", d.cur, r[1:])
+		d.cur += n
+	default:
+		log.Fatalf("Unknown direction")
+	}
+
+	fmt.Printf("%v, ", d.cur)
+
+	for d.cur > 99 {
+		d.cur -= 100
+	}
+
+	for d.cur < 0 {
+		d.cur += 100
+	}
+
+	fmt.Printf("%v\n", d.cur)
+
+	if d.cur == 0 {
+		fmt.Println(d.total)
+		d.total++
+		fmt.Println(d.total)
+	}
+}
+
+func main() {
+	log.SetPrefix("aoc25: ")
+	dial := Dial{50, 0}
+	fmt.Printf("c: %v, t: %v\n", dial.cur, dial.total)
+	file, err := os.Open("input.txt")
+	defer file.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		dial.Rotate(line)
+	}
+
+	fmt.Println(dial.total)
+}

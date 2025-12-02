@@ -1,0 +1,51 @@
+
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	log.SetPrefix("aoc25: ")
+	total := 0
+
+	file, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	scanner.Scan()
+	line := strings.SplitSeq(scanner.Text(), ",")
+	for r := range line {
+		rn := strings.Split(r, "-")
+		start, err := strconv.Atoi(rn[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		end, err := strconv.Atoi(rn[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for i := start; i <= end; i++ {
+
+			s := strconv.Itoa(i)
+
+			if len(s)%2 == 0 {
+				if s[:len(s)/2] == s[len(s)/2:] {
+					total += i
+				}
+			}
+
+		}
+	}
+
+	fmt.Printf("Result: %v\n", total)
+}

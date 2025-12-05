@@ -1,0 +1,104 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+)
+
+type Grid struct {
+	data       []string
+	rows, cols int
+}
+
+func (g Grid) is_accesible(row, col int) bool {
+	count := 0
+
+	if row > 0 {
+		if col > 0 && g.data[row-1][col-1] == '@' {
+			count++
+		}
+		if g.data[row-1][col] == '@' {
+			count++
+		}
+		if col < g.cols-1 && g.data[row-1][col+1] == '@' {
+			count++
+		}
+	}
+	if col > 0 && g.data[row][col-1] == '@' {
+		count++
+	}
+	if col < g.cols-1 && g.data[row][col+1] == '@' {
+		count++
+	}
+	if row < g.rows-1 {
+		if col > 0 && g.data[row+1][col-1] == '@' {
+			count++
+		}
+		if g.data[row+1][col] == '@' {
+			count++
+		}
+		if col < g.cols-1 && g.data[row+1][col+1] == '@' {
+			count++
+		}
+	}
+
+	return count < 4
+}
+
+func newGrid(data []string) Grid {
+	return Grid{data, len(data), len(data[0])}
+}
+
+func main() {
+	log.SetPrefix("aoc25: ")
+
+	file, err := os.Open(os.Args[1])
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	var data []string
+
+	for scanner.Scan() {
+		data = append(data, scanner.Text())
+	}
+
+	grid := newGrid(data)
+
+	total := 0
+
+	prev_total := -1
+
+	for total != prev_total {
+		prev_total = total
+		var data2 []string
+
+		for i := range grid.rows {
+			line := ""
+			for j := range grid.cols {
+				if grid.data[i][j] == '.' {
+					line += "."
+					continue
+				}
+				if grid.is_accesible(i, j) {
+					line += "."
+					total++
+					continue
+				}
+				line += "@"
+			}
+			data2 = append(data2, line)
+		}
+		fmt.Println(data2)
+		grid = newGrid(data2)
+	}
+
+	fmt.Printf("Resutl: %v\n", total)
+}

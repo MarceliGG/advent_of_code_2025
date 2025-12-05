@@ -1,0 +1,72 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+)
+
+type Range struct {
+	start, end int
+}
+
+func (r Range) contains(n int) bool {
+	return n >= r.start && n <= r.end
+}
+
+func main() {
+	log.SetPrefix("aoc25: ")
+
+	file, err := os.Open(os.Args[1])
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	var fresh []Range
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if line == "" {
+			break
+		}
+		rn := strings.Split(line, "-")
+		start, err := strconv.Atoi(rn[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		end, err := strconv.Atoi(rn[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fresh = append(fresh, Range{start, end})
+	}
+
+	total := 0
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		n, err := strconv.Atoi(line)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, r := range fresh {
+			if r.contains(n) {
+				total++
+				break
+			}
+		}
+	}
+
+	fmt.Printf("Result: %v\n", total)
+}

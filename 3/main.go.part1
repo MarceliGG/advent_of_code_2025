@@ -1,0 +1,66 @@
+package main
+
+import (
+	"bufio"
+	"cmp"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func Map[T any, U any](in []T, f func(T) U) []U {
+	out := make([]U, 0, len(in))
+	for _, v := range in {
+		out = append(out, f(v))
+	}
+	return out
+}
+
+func MaxIdx[T cmp.Ordered](in []T) (int, T) {
+	biggest := in[0]
+	biggest_idx := 0
+	for i, n := range in {
+		if n > biggest {
+			biggest = n
+			biggest_idx = i
+		}
+	}
+	return biggest_idx, biggest
+}
+
+func find_bigggest_joltage(bank string) int {
+	iBank := Map(strings.Split(bank, ""), func(s string) int {
+		j, err := strconv.Atoi(s)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return j
+	})
+
+	bi, b := MaxIdx(iBank[:len(iBank)-1])
+	_, s := MaxIdx(iBank[bi+1:])
+
+	return b*10 + s
+}
+
+func main() {
+	log.SetPrefix("aoc25: ")
+
+	file, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	total := 0
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		total += find_bigggest_joltage(line)
+	}
+
+	fmt.Println(total)
+}

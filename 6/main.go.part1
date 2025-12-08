@@ -1,0 +1,76 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	log.SetPrefix("aoc25: ")
+
+	file, err := os.Open(os.Args[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	scanner.Scan()
+
+	line1 := scanner.Text()
+	words1 := strings.Fields(line1)
+	lists := [][]string{}
+	for _, w := range words1 {
+		lists = append(lists, []string{w})
+	}
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		words := strings.Fields(line)
+		for i, w := range words {
+			lists[i] = append(lists[i], w)
+		}
+	}
+
+	total := 0
+
+	for _, list := range lists {
+		var eq func(x, y int) int
+		switch list[len(list)-1] {
+		case "*":
+			eq = func(x, y int) int {
+				return x * y
+			}
+		case "+":
+			eq = func(x, y int) int {
+				return x + y
+			}
+		default:
+			log.Fatal("incorrect equation")
+		}
+
+		t, err := strconv.Atoi(list[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for _, s := range list[1 : len(list)-1] {
+			n, err := strconv.Atoi(s)
+			if err != nil {
+				log.Fatal(err)
+			}
+			t = eq(t, n)
+		}
+
+		fmt.Println(t)
+
+		total += t
+	}
+
+	fmt.Printf("Result: %v\n", total)
+}
